@@ -7,10 +7,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SuggestionsMade {
+    public Map<PricingCategory, List<SuggestionMade>> forCategory = new HashMap<>();
     private String showId;
     private int partyRequested;
-
-    public Map<PricingCategory, List<SuggestionMade>> forCategory = new HashMap<>();
 
     public SuggestionsMade(String showId, int partyRequested) {
         this.showId = showId;

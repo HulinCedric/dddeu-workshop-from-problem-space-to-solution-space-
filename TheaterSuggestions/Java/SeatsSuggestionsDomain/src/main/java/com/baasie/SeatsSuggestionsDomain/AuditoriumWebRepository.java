@@ -23,7 +23,7 @@ public class AuditoriumWebRepository implements IProvideAuditoriumLayouts {
     public AuditoriumDto getAuditoriumSeatingFor(String showId) {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response
-                = restTemplate.getForEntity(uriAuditoriumSeatingRepository + "/api/data_for_auditoriumSeating/"+showId, String.class);
+                = restTemplate.getForEntity(uriAuditoriumSeatingRepository + "/api/data_for_auditoriumSeating/" + showId, String.class);
         ObjectMapper mapper = new ObjectMapper().registerModule(new GuavaModule());
         try {
             return mapper.readValue(response.getBody(), AuditoriumDto.class);

@@ -30,7 +30,7 @@ public final class SeatCollectionExtensions {
                 continue;
             }
 
-            if(doesNotExceedPartyRequestedAndCandidateSeatIsAdjacent(candidateSeat, adjacentSeats, partySize)) {
+            if (doesNotExceedPartyRequestedAndCandidateSeatIsAdjacent(candidateSeat, adjacentSeats, partySize)) {
                 adjacentSeats.add(candidateSeat);
             } else {
                 if (adjacentSeats.size() == 1) {

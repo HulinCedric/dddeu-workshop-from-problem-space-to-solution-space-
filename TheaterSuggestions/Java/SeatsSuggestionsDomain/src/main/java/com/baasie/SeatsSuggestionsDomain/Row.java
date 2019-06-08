@@ -18,12 +18,12 @@ public class Row {
         this.name = name;
         this.seats = seats
                 .stream()
-                    .map(s -> new Seat(
-                            s.rowName(),
-                            s.number(),
-                            s.pricingCategory(),
-                            s.seatAvailability(),
-                            s.computeDistanceFromRowCentroid(seats.size()))).collect(Collectors.toList());
+                .map(s -> new Seat(
+                        s.rowName(),
+                        s.number(),
+                        s.pricingCategory(),
+                        s.seatAvailability(),
+                        s.computeDistanceFromRowCentroid(seats.size()))).collect(Collectors.toList());
     }
 
     public List<Seat> seats() {
@@ -50,8 +50,7 @@ public class Row {
         for (AdjacentSeats adjacentSeats : adjacentSeatsOrdered) {
             seatingOptionSuggested.addSeats(adjacentSeats);
 
-            if (seatingOptionSuggested.matchExpectation())
-            {
+            if (seatingOptionSuggested.matchExpectation()) {
                 return seatingOptionSuggested;
             }
         }

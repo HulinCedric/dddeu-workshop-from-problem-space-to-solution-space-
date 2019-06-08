@@ -18,13 +18,11 @@ public class SuggestionRequest {
         return String.format("%s-%s", partyRequested, pricingCategory.toString());
     }
 
-    public PricingCategory pricingCategory()
-    {
+    public PricingCategory pricingCategory() {
         return pricingCategory;
     }
 
-    public int partyRequested()
-    {
+    public int partyRequested() {
         return partyRequested;
     }
 }

@@ -1,7 +1,6 @@
 package com.baasie.SeatsSuggestionsDomain;
 
 import com.baasie.ExternalDependencies.IProvideCurrentReservations;
-import com.baasie.ExternalDependencies.auditoriumlayoutrepository.AuditoriumDto;
 import com.baasie.ExternalDependencies.reservationsprovider.ReservedSeatsDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;

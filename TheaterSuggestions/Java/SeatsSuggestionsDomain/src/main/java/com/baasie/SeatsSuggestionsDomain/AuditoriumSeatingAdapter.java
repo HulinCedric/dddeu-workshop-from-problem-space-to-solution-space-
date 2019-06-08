@@ -3,9 +3,7 @@ package com.baasie.SeatsSuggestionsDomain;
 import com.baasie.ExternalDependencies.IProvideAuditoriumLayouts;
 import com.baasie.ExternalDependencies.IProvideCurrentReservations;
 import com.baasie.ExternalDependencies.auditoriumlayoutrepository.AuditoriumDto;
-import com.baasie.ExternalDependencies.auditoriumlayoutrepository.AuditoriumLayoutRepository;
 import com.baasie.ExternalDependencies.auditoriumlayoutrepository.SeatDto;
-import com.baasie.ExternalDependencies.reservationsprovider.ReservationsProvider;
 import com.baasie.ExternalDependencies.reservationsprovider.ReservedSeatsDto;
 import com.google.common.collect.ImmutableList;
 import org.springframework.stereotype.Service;
@@ -26,6 +24,14 @@ public class AuditoriumSeatingAdapter implements IAdaptAuditoriumSeating {
                                     IProvideCurrentReservations reservationsProvider) {
         this.auditoriumSeatingRepository = auditoriumSeatingRepository;
         this.reservationsProvider = reservationsProvider;
+    }
+
+    private static PricingCategory convertCategory(int seatDtoCategory) {
+        return PricingCategory.valueOf(seatDtoCategory);
+    }
+
+    private static int extractNumber(String name) {
+        return Integer.parseUnsignedInt(name.substring(1));
     }
 
     public AuditoriumSeating getAuditoriumSeating(String showId) {
@@ -55,13 +61,5 @@ public class AuditoriumSeatingAdapter implements IAdaptAuditoriumSeating {
         }
 
         return new AuditoriumSeating(rows);
-    }
-
-    private static PricingCategory convertCategory(int seatDtoCategory) {
-        return PricingCategory.valueOf(seatDtoCategory);
-    }
-
-    private static int extractNumber(String name) {
-        return Integer.parseUnsignedInt(name.substring(1));
     }
 }

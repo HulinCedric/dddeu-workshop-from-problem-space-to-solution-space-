@@ -3,14 +3,13 @@ package com.baasie.SeatsSuggestionsApi.controllers;
 
 import com.baasie.ExternalDependencies.IProvideAuditoriumLayouts;
 import com.baasie.ExternalDependencies.IProvideCurrentReservations;
-import com.baasie.ExternalDependencies.auditoriumlayoutrepository.AuditoriumDto;
 import com.baasie.SeatsSuggestionsDomain.AuditoriumSeatingAdapter;
-import com.baasie.SeatsSuggestionsDomain.Seat;
 import com.baasie.SeatsSuggestionsDomain.SeatAllocator;
 import com.baasie.SeatsSuggestionsDomain.SuggestionsMade;
-import org.springframework.web.bind.annotation.*;
-
-import javax.websocket.server.PathParam;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/SeatsSuggestions")

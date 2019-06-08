@@ -22,6 +22,7 @@ public class Seat {
     public Seat(String rowName, int number, PricingCategory pricingCategory, SeatAvailability seatAvailability) {
         this(rowName, number, pricingCategory, seatAvailability, 0);
     }
+
     public Seat(String rowName, int number, PricingCategory pricingCategory, SeatAvailability seatAvailability, int distanceFromCentroid) {
         this.rowName = rowName;
         this.number = number;
