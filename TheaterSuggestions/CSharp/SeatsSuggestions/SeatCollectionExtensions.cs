@@ -57,7 +57,7 @@ namespace SeatsSuggestions
 
             foreach (var adjacentSeat in adjacentSeats)
             {
-                var distanceFromRowCentroid = adjacentSeat.ComputeDistanceFromRowCentroid(rowSize);
+                var distanceFromRowCentroid = adjacentSeat.ComputeDistanceFromRowCentroid();
 
                 if (!sortedAdjacentSeatsGroups.ContainsKey(distanceFromRowCentroid))
                     sortedAdjacentSeatsGroups.Add(distanceFromRowCentroid, new List<AdjacentSeats>());

@@ -23,6 +23,7 @@ public class SeatAllocator {
                 PricingCategory.First));
         suggestionsMade.add(giveMeSuggestionsFor(auditoriumSeating, partyRequested,
                 PricingCategory.Second));
+
         suggestionsMade.add(giveMeSuggestionsFor(auditoriumSeating, partyRequested,
                 PricingCategory.Third));
         suggestionsMade.add(giveMeSuggestionsFor(auditoriumSeating, partyRequested,

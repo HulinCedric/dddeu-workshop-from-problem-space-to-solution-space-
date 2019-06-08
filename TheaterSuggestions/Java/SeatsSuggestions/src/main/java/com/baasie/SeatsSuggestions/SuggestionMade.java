@@ -2,6 +2,7 @@ package com.baasie.SeatsSuggestions;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,7 @@ public class SuggestionMade {
     }
 
     public List<String> seatNames() {
-        return suggestedSeats.stream().map(Seat::toString).collect(Collectors.toList());
+        return suggestedSeats.stream().sorted(Comparator.comparing(Seat::number)).map(Seat::toString).collect(Collectors.toList());
     }
 
     public boolean MatchExpectation() {

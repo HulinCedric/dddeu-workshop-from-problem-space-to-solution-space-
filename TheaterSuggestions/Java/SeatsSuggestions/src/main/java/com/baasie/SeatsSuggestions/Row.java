@@ -15,7 +15,14 @@ public class Row {
 
     public Row(String name, List<Seat> seats) {
         this.name = name;
-        this.seats = seats;
+        this.seats = seats
+                .stream()
+                    .map(s -> new Seat(
+                            s.rowName(),
+                            s.number(),
+                            s.pricingCategory(),
+                            s.seatAvailability(),
+                            s.computeDistanceFromRowCentroid(seats.size()))).collect(Collectors.toList());
     }
 
     public List<Seat> seats() {

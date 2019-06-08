@@ -1,9 +1,6 @@
 package com.baasie.SeatsSuggestions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SuggestionsMade {
@@ -18,7 +15,7 @@ public class SuggestionsMade {
 
         instantiateAnEmptyListForEveryPricingCategory();
     }
-
+//.sorted(Comparator.comparing(Seat::number))
     public Iterable<String> seatNames(PricingCategory pricingCategory) {
         List<SuggestionMade> suggestionsMade = forCategory.get(pricingCategory);
         return suggestionsMade.stream().map(s -> String.join("-", s.seatNames())).collect(Collectors.toList());

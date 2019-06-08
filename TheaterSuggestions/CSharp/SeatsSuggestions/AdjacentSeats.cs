@@ -23,7 +23,7 @@ namespace SeatsSuggestions
             _seats = seats.ToList();
         }
 
-        public int ComputeDistanceFromRowCentroid(int rowSize)
+        public int ComputeDistanceFromRowCentroid()
         {
             return _seats.Select(s => s.DistanceFromRowCentroid).ToList().Sum() / _seats.Count;
         }

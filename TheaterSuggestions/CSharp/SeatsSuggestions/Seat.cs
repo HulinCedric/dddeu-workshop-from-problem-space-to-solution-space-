@@ -30,17 +30,14 @@ namespace SeatsSuggestions
 
         public bool MatchCategory(PricingCategory pricingCategory)
         {
-            if (pricingCategory == PricingCategory.Mixed) return true;
-
-            return PricingCategory == pricingCategory;
+            return pricingCategory == PricingCategory.Mixed || PricingCategory == pricingCategory;
         }
 
         public Seat Allocate()
         {
-            if (SeatAvailability == SeatAvailability.Available)
-                return new Seat(RowName, Number, PricingCategory, SeatAvailability.Allocated);
-
-            return this;
+            return SeatAvailability == SeatAvailability.Available 
+                ? new Seat(RowName, Number, PricingCategory, SeatAvailability.Allocated) 
+                : this;
         }
 
         public bool SameSeatLocation(Seat seat)
@@ -71,18 +68,14 @@ namespace SeatsSuggestions
             return $"{RowName}{Number}";
         }
 
-        public bool IsAdjacentWith(List<Seat> seats)
+        public bool IsAdjacentWith(IEnumerable<Seat> seats)
         {
-            var orderedSeats = seats.OrderBy(s => s.Number).ToList();
-
-            var seat = orderedSeats.First();
-
-            if (Number + 1 == seat.Number || Number - 1 == seat.Number)
-                return true;
-
-            seat = seats.Last();
-
-            return Number + 1 == seat.Number || Number - 1 == seat.Number;
+            foreach (var seat in seats.OrderBy(s => s.Number).ToList()) 
+            {
+                if (Number + 1 == seat.Number || Number - 1 == seat.Number)
+                    return true;
+            }
+            return false;
         }
     }
 }

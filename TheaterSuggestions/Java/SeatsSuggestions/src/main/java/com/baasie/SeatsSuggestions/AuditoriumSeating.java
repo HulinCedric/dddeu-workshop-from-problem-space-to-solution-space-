@@ -21,7 +21,7 @@ public class AuditoriumSeating {
             SeatingOptionSuggested seatingOptionSuggested = row.suggestSeatingOption(suggestionRequest);
 
             if (seatingOptionSuggested.matchExpectation()) {
-                // Cool, we mark the seat as Allocated (that we turns into a SuggestionMode)
+                // Cool, we mark the seat as Allocated (that we turns into a SuggestionMade)
                 return seatingOptionSuggested;
             }
         }
