@@ -41,15 +41,15 @@ public class AuditoriumSeatingAdapter {
 
         Map<String, Row> rows = new HashMap<>();
 
-        for (Map.Entry<String, ImmutableList<SeatDto>> rowDto : auditoriumDto.rows().entrySet()) {
+        for (Map.Entry<String, ImmutableList<SeatDto>> rowDto : auditoriumDto.rows.entrySet()) {
             List<Seat> seats = new ArrayList<>();
 
             rowDto.getValue().forEach(seatDto -> {
                 String rowName = rowDto.getKey();
-                int number = extractNumber(seatDto.name());
-                PricingCategory pricingCategory = convertCategory(seatDto.category());
+                int number = extractNumber(seatDto.name);
+                PricingCategory pricingCategory = convertCategory(seatDto.category);
 
-                boolean isReserved = reservedSeatsDto.reservedSeats().contains(seatDto.name());
+                boolean isReserved = reservedSeatsDto.reservedSeats.contains(seatDto.name);
 
                 seats.add(new Seat(rowName, number, pricingCategory, isReserved ? SeatAvailability.Reserved : SeatAvailability.Available));
             });
