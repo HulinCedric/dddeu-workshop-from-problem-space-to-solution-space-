@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import static com.baasie.SeatsSuggestionsDomain.SeatCollectionExtensions.*;
 
+
 @EqualsAndHashCode
 public class Row {
     private String name;
@@ -15,7 +16,14 @@ public class Row {
 
     public Row(String name, List<Seat> seats) {
         this.name = name;
-        this.seats = seats;
+        this.seats = seats
+                .stream()
+                    .map(s -> new Seat(
+                            s.rowName(),
+                            s.number(),
+                            s.pricingCategory(),
+                            s.seatAvailability(),
+                            s.computeDistanceFromRowCentroid(seats.size()))).collect(Collectors.toList());
     }
 
     public List<Seat> seats() {

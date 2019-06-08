@@ -13,21 +13,24 @@ public final class SeatCollectionExtensions {
         return seats.stream().filter(seat -> seat.isAvailable() && seat.matchCategory(pricingCategory)).collect(Collectors.toList());
     }
 
-    public static List<AdjacentSeats> selectAdjacentSeats(List<Seat> seats, int size) {
+    public static List<AdjacentSeats> selectAdjacentSeats(List<Seat> sortedSeatByDistanceFromCentroid, int partySize) {
         List<AdjacentSeats> adjacentSeatsGroups = new ArrayList<>();
         List<Seat> adjacentSeats = new ArrayList<>();
 
-        if (size == 1) {
-            return seats.stream().map(seat -> new AdjacentSeats(Stream.of(seat).collect(Collectors.toCollection(ArrayList::new)))).collect(Collectors.toList());
+        if (partySize == 1) {
+            return sortedSeatByDistanceFromCentroid.stream().map(seat -> new AdjacentSeats(Stream.of(seat).collect(Collectors.toCollection(ArrayList::new)))).collect(Collectors.toList());
         }
+        sortedSeatByDistanceFromCentroid = sortedSeatByDistanceFromCentroid.stream()
+                .sorted(Comparator.comparing(Seat::distanceFromCentroid))
+                .collect(Collectors.toCollection(ArrayList::new));
 
-        for (Seat candidateSeat : seats) {
+        for (Seat candidateSeat : sortedSeatByDistanceFromCentroid) {
             if (adjacentSeats.size() == 0) {
                 adjacentSeats.add(candidateSeat);
                 continue;
             }
 
-            if (candidateSeat.isAdjacentWith(adjacentSeats.get(adjacentSeats.size() - 1).number())) {
+            if(doesNotExceedPartyRequestedAndCandidateSeatIsAdjacent(candidateSeat, adjacentSeats, partySize)) {
                 adjacentSeats.add(candidateSeat);
             } else {
                 if (adjacentSeats.size() == 1) {
@@ -46,7 +49,11 @@ public final class SeatCollectionExtensions {
         if (adjacentSeatsGroups.size() == 0) {
             adjacentSeatsGroups.add(new AdjacentSeats(adjacentSeats));
         }
-        return adjacentSeatsGroups.stream().filter(a -> a.size() >= size).flatMap(a -> a.splitInto(size).stream()).collect(Collectors.toList());
+        return adjacentSeatsGroups.stream().filter(a -> a.size() >= partySize).collect(Collectors.toList());
+    }
+
+    private static boolean doesNotExceedPartyRequestedAndCandidateSeatIsAdjacent(Seat candidateSeat, List<Seat> adjacentSeats, int partySize) {
+        return candidateSeat.isAdjacentWith(adjacentSeats) && adjacentSeats.size() < partySize;
     }
 
     public static List<AdjacentSeats> orderByMiddleOfTheRow(List<AdjacentSeats> adjacentSeats,
@@ -54,7 +61,7 @@ public final class SeatCollectionExtensions {
         Map<Integer, List<AdjacentSeats>> sortedAdjacentSeatsGroups = new TreeMap<>();
 
         for (AdjacentSeats adjacentSeat : adjacentSeats) {
-            int distance = adjacentSeat.computeDistanceFromRowCentroid(rowSize);
+            int distance = adjacentSeat.computeDistanceFromRowCentroid();
 
             if (!sortedAdjacentSeatsGroups.containsKey(distance)) {
                 sortedAdjacentSeatsGroups.put(distance, new ArrayList<>());
