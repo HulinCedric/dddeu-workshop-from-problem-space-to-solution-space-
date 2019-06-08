@@ -37,8 +37,7 @@ public class AuditoriumLayoutRepository {
     }
 
     public AuditoriumDto getAuditoriumSeatingFor(String showId) {
-        if (repository.containsKey(showId))
-        {
+        if (repository.containsKey(showId)) {
             return repository.get(showId);
         }
 
