@@ -13,7 +13,7 @@ namespace SeatsSuggestions.Domain
             return seats.Where(s => s.IsAvailable() && s.MatchCategory(pricingCategory));
         }
 
-        public static IEnumerable<AdjacentSeats> SelectAdjacentSeats(this IEnumerable<Seat> seats,
+         public static IEnumerable<AdjacentSeats> SelectAdjacentSeats(this IEnumerable<Seat> seats,
             int partySize)
         {
             var adjacentSeatsGroups = new List<AdjacentSeats>();
@@ -22,7 +22,7 @@ namespace SeatsSuggestions.Domain
 
             if (partySize == 1) return currentSeats.Select(s => new AdjacentSeats(new List<Seat> {s}));
 
-            foreach (var candidateSeat in currentSeats.OrderBy(s => s.DistanceFromRowCentroid).ToList())
+            foreach (var candidateSeat in currentSeats)
             {
                 if (!adjacentSeats.Any())
                 {
@@ -32,24 +32,34 @@ namespace SeatsSuggestions.Domain
 
                 adjacentSeats = adjacentSeats.OrderBy(s => s.Number).ToList();
 
-                if (DoesNotExceedPartyRequestedAndCandidateSeatIsAdjacent(candidateSeat, adjacentSeats, partySize))
+                if (candidateSeat.IsAdjacentWith(adjacentSeats))
                 {
                     adjacentSeats.Add(candidateSeat);
 
                     if (NoMoreSeats(adjacentSeats, currentSeats))
                     {
-                        adjacentSeatsGroups.Add(new AdjacentSeats(adjacentSeats));
+                        adjacentSeatsGroups.Add(new AdjacentSeats(ReduceAdjacentSeats(partySize, adjacentSeats)));
                     }
                 }
                 else
                 {
-                    if (adjacentSeats.Any()) adjacentSeatsGroups.Add(new AdjacentSeats(adjacentSeats));
+                    if (adjacentSeats.Any())
+                    {
+                        adjacentSeatsGroups.Add(ReduceAdjacentSeats(partySize, adjacentSeats));
+                    }
 
                     adjacentSeats = new List<Seat> {candidateSeat};
                 }
             }
 
-            return adjacentSeatsGroups.Where(adjacent => adjacent.Count() == partySize);
+            return adjacentSeatsGroups.Where(adjacent => adjacent.Count() >= partySize);
+        }
+
+        private static AdjacentSeats ReduceAdjacentSeats(int partySize, List<Seat> adjacentSeats)
+        {
+            var orderedEnumerable = adjacentSeats.OrderBy(s => s.DistanceFromRowCentroid).ToList();
+
+            return new AdjacentSeats(orderedEnumerable.Take(partySize).OrderBy(s => s.Number));
         }
 
         private static bool NoMoreSeats(ICollection adjacentSeats, ICollection currentSeats)
