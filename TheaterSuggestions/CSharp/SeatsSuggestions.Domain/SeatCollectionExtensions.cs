@@ -55,7 +55,7 @@ namespace SeatsSuggestions.Domain
             return adjacentSeatsGroups.Where(adjacent => adjacent.Count() >= partySize);
         }
 
-        private static AdjacentSeats ReduceAdjacentSeats(int partySize, List<Seat> adjacentSeats)
+        private static AdjacentSeats ReduceAdjacentSeats(int partySize, IEnumerable<Seat> adjacentSeats)
         {
             var orderedEnumerable = adjacentSeats.OrderBy(s => s.DistanceFromRowCentroid).ToList();
 
@@ -65,13 +65,6 @@ namespace SeatsSuggestions.Domain
         private static bool NoMoreSeats(ICollection adjacentSeats, ICollection currentSeats)
         {
             return adjacentSeats.Count == currentSeats.Count;
-        }
-
-        private static bool DoesNotExceedPartyRequestedAndCandidateSeatIsAdjacent(Seat candidateSeat,
-            List<Seat> adjacentSeats,
-            int partySize)
-        {
-            return candidateSeat.IsAdjacentWith(adjacentSeats) && adjacentSeats.Count < partySize;
         }
 
         public static IEnumerable<AdjacentSeats> OrderByMiddleOfTheRow(this IEnumerable<AdjacentSeats> adjacentSeats,

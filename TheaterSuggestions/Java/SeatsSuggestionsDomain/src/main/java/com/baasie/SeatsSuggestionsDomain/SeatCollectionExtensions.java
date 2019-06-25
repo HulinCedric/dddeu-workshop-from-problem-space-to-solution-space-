@@ -13,37 +13,38 @@ public final class SeatCollectionExtensions {
         return seats.stream().filter(seat -> seat.isAvailable() && seat.matchCategory(pricingCategory)).collect(Collectors.toList());
     }
 
-    public static List<AdjacentSeats> selectAdjacentSeats(List<Seat> sortedSeatByDistanceFromCentroid, int partySize) {
+    public static List<AdjacentSeats> selectAdjacentSeats(List<Seat> seats, int partySize) {
         List<AdjacentSeats> adjacentSeatsGroups = new ArrayList<>();
         List<Seat> adjacentSeats = new ArrayList<>();
 
         if (partySize == 1) {
-            return sortedSeatByDistanceFromCentroid.stream().map(seat -> new AdjacentSeats(Stream.of(seat).collect(Collectors.toCollection(ArrayList::new)))).collect(Collectors.toList());
+            return seats.stream().map(seat -> new AdjacentSeats(Stream.of(seat).collect(Collectors.toCollection(ArrayList::new)))).collect(Collectors.toList());
         }
-        sortedSeatByDistanceFromCentroid = sortedSeatByDistanceFromCentroid.stream()
+
+        List<Seat> sortedSeatByDistanceFromCentroid = seats.stream()
                 .sorted(Comparator.comparing(Seat::distanceFromCentroid))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        for (Seat candidateSeat : sortedSeatByDistanceFromCentroid) {
+        for (Seat candidateSeat : seats) {
             if (adjacentSeats.size() == 0) {
                 adjacentSeats.add(candidateSeat);
                 continue;
             }
 
-            if (doesNotExceedPartyRequestedAndCandidateSeatIsAdjacent(candidateSeat, adjacentSeats, partySize)) {
+            if (candidateSeat.isAdjacentWith(adjacentSeats)) {
                 adjacentSeats.add(candidateSeat);
             } else {
                 if (adjacentSeats.size() == 1) {
                     adjacentSeats = Stream.of(candidateSeat).collect(Collectors.toCollection(ArrayList::new));
                 } else {
-                    adjacentSeatsGroups.add(new AdjacentSeats(adjacentSeats));
+                    adjacentSeatsGroups.add(ReduceAdjacentSeats(partySize, adjacentSeats));
                     adjacentSeats = Stream.of(candidateSeat).collect(Collectors.toCollection(ArrayList::new));
                 }
             }
         }
 
         if (adjacentSeats.size() > 1) {
-            adjacentSeatsGroups.add(new AdjacentSeats(adjacentSeats));
+            adjacentSeatsGroups.add(ReduceAdjacentSeats(partySize, adjacentSeats));
         }
 
         if (adjacentSeatsGroups.size() == 0) {
@@ -52,8 +53,17 @@ public final class SeatCollectionExtensions {
         return adjacentSeatsGroups.stream().filter(a -> a.size() >= partySize).collect(Collectors.toList());
     }
 
-    private static boolean doesNotExceedPartyRequestedAndCandidateSeatIsAdjacent(Seat candidateSeat, List<Seat> adjacentSeats, int partySize) {
-        return candidateSeat.isAdjacentWith(adjacentSeats) && adjacentSeats.size() < partySize;
+    private static AdjacentSeats ReduceAdjacentSeats(int partySize, List<Seat> adjacentSeats) {
+
+        List<Seat> orderedAdjacentSeats = adjacentSeats.stream()
+                .sorted(Comparator.comparing(Seat::distanceFromCentroid))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        List<Seat> sortedSeats = orderedAdjacentSeats.stream()
+                .limit(partySize)
+                .sorted(Comparator.comparing(Seat::number))
+                .collect(Collectors.toCollection(ArrayList::new));
+        return new AdjacentSeats(sortedSeats);
     }
 
     public static List<AdjacentSeats> orderByMiddleOfTheRow(List<AdjacentSeats> adjacentSeats,
