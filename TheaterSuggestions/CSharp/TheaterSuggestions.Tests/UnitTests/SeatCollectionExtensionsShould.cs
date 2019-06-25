@@ -145,7 +145,7 @@ namespace SeatsSuggestions.Tests.UnitTests
             };
             seats = ComputeDistances(seats, 10);
             var adjacentSeats = seats.SelectAdjacentSeats(2);
-            Check.That(adjacentSeats.Select(s => s.ToString())).ContainsExactly("A5-A6", "A3-A4", "A8-A9");
+            Check.That(adjacentSeats.Select(s => s.ToString())).ContainsExactly("A5-A6");
         }
 
         [Test]

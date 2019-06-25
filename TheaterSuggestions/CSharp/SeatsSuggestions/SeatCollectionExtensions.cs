@@ -22,7 +22,7 @@ namespace SeatsSuggestions
 
             if (partySize == 1) return currentSeats.Select(s => new AdjacentSeats(new List<Seat> {s}));
 
-            foreach (var candidateSeat in currentSeats.OrderBy(s => s.DistanceFromRowCentroid).ToList())
+            foreach (var candidateSeat in currentSeats.ToList())
             {
                 if (!adjacentSeats.Any())
                 {
@@ -32,26 +32,31 @@ namespace SeatsSuggestions
 
                 adjacentSeats = adjacentSeats.OrderBy(s => s.Number).ToList();
 
-                if (DoesNotExceedPartyRequestedAndCandidateSeatIsAdjacent(candidateSeat, adjacentSeats, partySize))
+                if (candidateSeat.IsAdjacentWith(adjacentSeats))
                 {
                     adjacentSeats.Add(candidateSeat);
 
                     if (NoMoreSeats(adjacentSeats, currentSeats))
-                    {
-                        adjacentSeatsGroups.Add(new AdjacentSeats(adjacentSeats));
-                    }
+                        adjacentSeatsGroups.Add(new AdjacentSeats(ReduceAdjacentSeats(partySize, adjacentSeats)));
                 }
                 else
                 {
-                    if (adjacentSeats.Any()) adjacentSeatsGroups.Add(new AdjacentSeats(adjacentSeats));
+                    if (adjacentSeats.Any())
+                        adjacentSeatsGroups.Add(ReduceAdjacentSeats(partySize, adjacentSeats));
 
                     adjacentSeats = new List<Seat> {candidateSeat};
                 }
             }
 
-            return adjacentSeatsGroups.Where(adjacent => adjacent.Count() == partySize);
+            return adjacentSeatsGroups.Where(adjacent => adjacent.Count() >= partySize);
         }
 
+        private static AdjacentSeats ReduceAdjacentSeats(int partySize, IEnumerable<Seat> adjacentSeats)
+        {
+            var orderedAdjacentSeats = adjacentSeats.OrderBy(s => s.DistanceFromRowCentroid).ToList();
+
+            return new AdjacentSeats(orderedAdjacentSeats.Take(partySize).OrderBy(s => s.Number));
+        }
         private static bool NoMoreSeats(ICollection adjacentSeats, ICollection currentSeats)
         {
             return adjacentSeats.Count == currentSeats.Count;
