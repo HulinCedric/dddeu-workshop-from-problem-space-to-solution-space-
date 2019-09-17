@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SeatsSuggestions.Infra;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace SeatsSuggestions.Api
 {
@@ -30,14 +31,19 @@ namespace SeatsSuggestions.Api
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            IProvideAuditoriumLayouts auditoriumSeatingRepository = new AuditoriumWebRepository("http://localhost:6000/");
+            IProvideAuditoriumLayouts auditoriumSeatingRepository = new AuditoriumWebRepository("http://localhost:50950/");
             // api/data_for_auditoriumSeating/
 
-            IProvideCurrentReservations seatReservationsProvider = new SeatReservationsWebAdapter("http://localhost:5000/"); 
+            IProvideCurrentReservations seatReservationsProvider = new SeatReservationsWebAdapter("http://localhost:50951/"); 
             // data_for_reservation_seats/
 
             services.AddSingleton<IProvideAuditoriumLayouts>(auditoriumSeatingRepository);
             services.AddSingleton<IProvideCurrentReservations>(seatReservationsProvider);
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "SeatsSuggestions API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,7 +54,14 @@ namespace SeatsSuggestions.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSwagger();
+
             app.UseMvc();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SeatsSuggestions API v1");
+            });
         }
     }
 }
