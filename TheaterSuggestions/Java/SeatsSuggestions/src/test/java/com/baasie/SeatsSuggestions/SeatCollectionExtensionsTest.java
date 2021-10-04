@@ -12,6 +12,10 @@ import static com.google.common.truth.Truth.assertThat;
 
 public class SeatCollectionExtensionsTest {
 
+    private static List<Seat> computeDistances(List<Seat> seats, int rowSize) {
+        return seats.stream().map(s -> new Seat(s.rowName(), s.number(), s.pricingCategory(), s.seatAvailability(), s.computeDistanceFromRowCentroid(rowSize))).collect(Collectors.toList());
+    }
+
     @Test
     public void SelectAvailableSeatsCompliantWith_when_all_are_First_and_requesting_First() {
         List<Seat> seats = new ArrayList<>(Arrays.asList(
@@ -81,28 +85,32 @@ public class SeatCollectionExtensionsTest {
                 new Seat("A", 10, PricingCategory.First, SeatAvailability.Available)
         ));
 
+        seats = computeDistances(seats, 10);
+
         List<AdjacentSeats> adjacentSeats = selectAdjacentSeats(seats, 2);
-        assertThat(adjacentSeats.stream().map(AdjacentSeats::toString).collect(Collectors.toList())).containsExactly("A3-A4", "A5-A6", "A8-A9");
+        assertThat(adjacentSeats.stream().map(AdjacentSeats::toString).collect(Collectors.toList())).containsExactly("A5-A6");
     }
 
     @Test
     public void Order_by_middle_of_the_Row() {
         List<Seat> seats = new ArrayList<>(Arrays.asList(
                 new Seat("A", 1, PricingCategory.First, SeatAvailability.Available),
-
+                new Seat("A", 2, PricingCategory.First, SeatAvailability.Available),
                 new Seat("A", 3, PricingCategory.Second, SeatAvailability.Available),
                 new Seat("A", 4, PricingCategory.First, SeatAvailability.Available),
                 new Seat("A", 5, PricingCategory.First, SeatAvailability.Available),
                 new Seat("A", 6, PricingCategory.Second, SeatAvailability.Available),
-
+                new Seat("A", 7, PricingCategory.Second, SeatAvailability.Available),
                 new Seat("A", 8, PricingCategory.First, SeatAvailability.Available),
                 new Seat("A", 9, PricingCategory.First, SeatAvailability.Available),
                 new Seat("A", 10, PricingCategory.First, SeatAvailability.Available)
         ));
 
-        List<AdjacentSeats> adjacentSeats = selectAdjacentSeats(seats, 2);
+        seats = computeDistances(seats, seats.size());
+
+        List<AdjacentSeats> adjacentSeats = selectAdjacentSeats(seats, 4);
         List<AdjacentSeats> orderByMiddleOfTheRow = orderByMiddleOfTheRow(adjacentSeats, 10);
-        assertThat(orderByMiddleOfTheRow.stream().map(AdjacentSeats::toString).collect(Collectors.toList())).containsExactly("A5-A6", "A3-A4", "A8-A9");
+        assertThat(orderByMiddleOfTheRow.stream().map(AdjacentSeats::toString).collect(Collectors.toList())).containsExactly("A4-A5-A6-A7");
     }
 
     @Test

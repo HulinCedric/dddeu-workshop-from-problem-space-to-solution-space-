@@ -11,7 +11,7 @@ public class AdjacentSeats implements Iterable<Seat> {
 
     private List<Seat> seats;
 
-    AdjacentSeats(List<Seat> seats) {
+    public AdjacentSeats(List<Seat> seats) {
         this.seats = seats;
     }
 

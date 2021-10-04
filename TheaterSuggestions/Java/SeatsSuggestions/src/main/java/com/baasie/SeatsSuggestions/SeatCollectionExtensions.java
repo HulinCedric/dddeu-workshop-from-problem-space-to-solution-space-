@@ -16,44 +16,43 @@ public final class SeatCollectionExtensions {
     public static List<AdjacentSeats> selectAdjacentSeats(List<Seat> seats, int partySize) {
         List<AdjacentSeats> adjacentSeatsGroups = new ArrayList<>();
         List<Seat> adjacentSeats = new ArrayList<>();
+        List<Seat> currentSeats = new ArrayList<>(seats);
 
         if (partySize == 1) {
-            return seats.stream().map(seat -> new AdjacentSeats(Stream.of(seat).collect(Collectors.toCollection(ArrayList::new)))).collect(Collectors.toList());
+            return currentSeats.stream().map(seat -> new AdjacentSeats(Stream.of(seat).collect(Collectors.toCollection(ArrayList::new)))).collect(Collectors.toList());
         }
 
-        List<Seat> sortedSeatByDistanceFromCentroid = seats.stream()
-                .sorted(Comparator.comparing(Seat::distanceFromCentroid))
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        for (Seat candidateSeat : seats) {
-            if (adjacentSeats.size() == 0) {
+        for (Seat candidateSeat : currentSeats) {
+            if (adjacentSeats.isEmpty()) {
                 adjacentSeats.add(candidateSeat);
                 continue;
             }
 
+            adjacentSeats = adjacentSeats.stream()
+                    .sorted(Comparator.comparing(Seat::number))
+                    .collect(Collectors.toCollection(ArrayList::new));
+
             if (candidateSeat.isAdjacentWith(adjacentSeats)) {
                 adjacentSeats.add(candidateSeat);
-            } else {
-                if (adjacentSeats.size() == 1) {
-                    adjacentSeats = Stream.of(candidateSeat).collect(Collectors.toCollection(ArrayList::new));
-                } else {
-                    adjacentSeatsGroups.add(ReduceAdjacentSeats(partySize, adjacentSeats));
-                    adjacentSeats = Stream.of(candidateSeat).collect(Collectors.toCollection(ArrayList::new));
+
+                if (noMoreSeats(adjacentSeats, currentSeats)) {
+                    adjacentSeatsGroups.add(reduceAdjacentSeats(partySize, adjacentSeats));
                 }
+
+            } else {
+                if (!adjacentSeats.isEmpty()) {
+                    adjacentSeatsGroups.add(reduceAdjacentSeats(partySize, adjacentSeats));
+                }
+
+                adjacentSeats = new ArrayList<>();
+                adjacentSeats.add(candidateSeat);
+
             }
-        }
-
-        if (adjacentSeats.size() > 1) {
-            adjacentSeatsGroups.add(ReduceAdjacentSeats(partySize, adjacentSeats));
-        }
-
-        if (adjacentSeatsGroups.size() == 0) {
-            adjacentSeatsGroups.add(new AdjacentSeats(adjacentSeats));
         }
         return adjacentSeatsGroups.stream().filter(a -> a.size() >= partySize).collect(Collectors.toList());
     }
 
-    private static AdjacentSeats ReduceAdjacentSeats(int partySize, List<Seat> adjacentSeats) {
+    private static AdjacentSeats reduceAdjacentSeats(int partySize, List<Seat> adjacentSeats) {
 
         List<Seat> orderedAdjacentSeats = adjacentSeats.stream()
                 .sorted(Comparator.comparing(Seat::distanceFromCentroid))
@@ -68,16 +67,16 @@ public final class SeatCollectionExtensions {
 
     public static List<AdjacentSeats> orderByMiddleOfTheRow(List<AdjacentSeats> adjacentSeats,
                                                             int rowSize) {
-        Map<Integer, List<AdjacentSeats>> sortedAdjacentSeatsGroups = new TreeMap<>();
+        SortedMap<Integer, List<AdjacentSeats>> sortedAdjacentSeatsGroups = new TreeMap<>();
 
         for (AdjacentSeats adjacentSeat : adjacentSeats) {
-            int distance = adjacentSeat.computeDistanceFromRowCentroid();
+            int distanceFromRowCentroid = adjacentSeat.computeDistanceFromRowCentroid();
 
-            if (!sortedAdjacentSeatsGroups.containsKey(distance)) {
-                sortedAdjacentSeatsGroups.put(distance, new ArrayList<>());
+            if (!sortedAdjacentSeatsGroups.containsKey(distanceFromRowCentroid)) {
+                sortedAdjacentSeatsGroups.put(distanceFromRowCentroid, new ArrayList<>());
             }
 
-            sortedAdjacentSeatsGroups.get(distance).add(adjacentSeat);
+            sortedAdjacentSeatsGroups.get(distanceFromRowCentroid).add(adjacentSeat);
         }
 
         return sortedAdjacentSeatsGroups.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
@@ -85,6 +84,11 @@ public final class SeatCollectionExtensions {
 
     public static int centroidIndex(int rowSize) {
         return Math.abs(rowSize / 2);
+    }
+
+    private static boolean noMoreSeats(Collection adjacentSeats, Collection currentSeats)
+    {
+        return adjacentSeats.size() == currentSeats.size();
     }
 
     public static int computeDistanceFromCentroid(int seatLocation, int rowSize) {
