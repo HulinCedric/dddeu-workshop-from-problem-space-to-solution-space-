@@ -1,41 +1,48 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Value;
 
 namespace SeatsSuggestions
 {
-    public class Row
+    public class Row : ValueType<Row>
     {
-        public string Name { get; }
-        public List<Seat> Seats { get; }
-
         public Row(string name, List<Seat> seats)
         {
             Name = name;
-            Seats = seats;
+            Seats = seats.AsReadOnly();
         }
 
-        public void AddSeat(Seat seat)
+        public string Name { get; }
+        public IReadOnlyList<Seat> Seats { get; }
+
+        public Row AddSeat(Seat seat)
         {
-            Seats.Add(seat);
+            var seats = Seats.ToList();
+            seats.Add(seat);
+            return new Row(Name, seats);
         }
 
         public SeatingOptionSuggested SuggestSeatingOption(int partyRequested, PricingCategory pricingCategory)
         {
             foreach (var seat in Seats)
-            {
-                if (seat.IsAvailable() && seat.MatchCategory(pricingCategory))
+                if (seat.IsAvailable() &&
+                    seat.MatchCategory(pricingCategory))
                 {
                     var seatAllocation = new SeatingOptionSuggested(partyRequested, pricingCategory);
 
                     seatAllocation.AddSeat(seat);
 
                     if (seatAllocation.MatchExpectation())
-                    {
                         return seatAllocation;
-                    }
                 }
-            }
 
             return new SeatingOptionNotAvailable(partyRequested, pricingCategory);
+        }
+
+        protected override IEnumerable<object> GetAllAttributesToBeUsedForEquality()
+        {
+            yield return Name;
+            yield return new ListByValue<Seat>(Seats.ToList());
         }
     }
 }
