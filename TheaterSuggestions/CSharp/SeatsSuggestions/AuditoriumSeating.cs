@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
+using Value;
+using Value.Shared;
 
 namespace SeatsSuggestions
 {
-    public class AuditoriumSeating
+    public class AuditoriumSeating : ValueType<AuditoriumSeating>
     {
-        public IReadOnlyDictionary<string, Row> Rows => _rows;
-
         private readonly Dictionary<string, Row> _rows;
 
         public AuditoriumSeating(Dictionary<string, Row> rows)
-        {
-            _rows = rows;
-        }
+            => _rows = rows;
+
+        public IReadOnlyDictionary<string, Row> Rows
+            => _rows;
 
         public SeatingOptionSuggested SuggestSeatingOptionFor(int partyRequested, PricingCategory pricingCategory)
         {
@@ -20,12 +21,15 @@ namespace SeatsSuggestions
                 var seatOptionsSuggested = row.SuggestSeatingOption(partyRequested, pricingCategory);
 
                 if (seatOptionsSuggested.MatchExpectation())
-                {
                     return seatOptionsSuggested;
-                }
             }
 
             return new SeatingOptionNotAvailable(partyRequested, pricingCategory);
+        }
+
+        protected override IEnumerable<object> GetAllAttributesToBeUsedForEquality()
+        {
+            yield return new DictionaryByValue<string, Row>(_rows);
         }
     }
 }
