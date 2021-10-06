@@ -44,5 +44,15 @@ namespace SeatsSuggestions
             yield return Name;
             yield return new ListByValue<Seat>(Seats.ToList());
         }
+
+        public Row Allocate(Seat seatToAllocate)
+        {
+            var newVersionOfSeats = new List<Seat>(Seats);
+
+            var indexOfSeatToAllocate = newVersionOfSeats.IndexOf(seatToAllocate);
+            newVersionOfSeats[indexOfSeatToAllocate] = seatToAllocate.Allocate();
+
+            return new Row(seatToAllocate.RowName, newVersionOfSeats);
+        }
     }
 }

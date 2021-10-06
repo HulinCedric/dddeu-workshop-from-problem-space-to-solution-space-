@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SeatsSuggestions
 {
@@ -44,10 +45,7 @@ namespace SeatsSuggestions
 
                 if (seatAllocation.MatchExpectation())
                 {
-                    foreach (var seat in seatAllocation.Seats)
-                    {
-                        seat.Allocate();
-                    }
+                    auditoriumSeating = auditoriumSeating.Allocate(seatAllocation);
 
                     foundedSuggestions.Add(new SuggestionMade(partyRequested, pricingCategory, seatAllocation.Seats));
                 }

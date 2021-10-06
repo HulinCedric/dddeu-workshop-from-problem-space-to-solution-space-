@@ -31,5 +31,22 @@ namespace SeatsSuggestions
         {
             yield return new DictionaryByValue<string, Row>(_rows);
         }
+
+        public AuditoriumSeating Allocate(SeatingOptionSuggested seatAllocation)
+            => AllocateSeats(seatAllocation.Seats);
+
+        private AuditoriumSeating AllocateSeats(List<Seat> seatAllocationSeats)
+        {
+            var newVersionOfRows = new Dictionary<string, Row>(_rows);
+
+            foreach (var seatToAllocate in seatAllocationSeats)
+            {
+                var newVersionOfRow = newVersionOfRows[seatToAllocate.RowName];
+                newVersionOfRow = newVersionOfRow.Allocate(seatToAllocate);
+                newVersionOfRows[newVersionOfRow.Name] = newVersionOfRow;
+            }
+
+            return new AuditoriumSeating(newVersionOfRows);
+        }
     }
 }
