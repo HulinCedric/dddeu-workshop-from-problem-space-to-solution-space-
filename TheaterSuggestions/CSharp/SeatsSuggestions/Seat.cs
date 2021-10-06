@@ -1,46 +1,53 @@
-﻿namespace SeatsSuggestions
+﻿using System.Collections.Generic;
+using Value;
+
+namespace SeatsSuggestions
 {
-    public class Seat
+    public class Seat : ValueType<Seat>
     {
+        private readonly SeatAvailability seatAvailability;
+
         public Seat(string rowName, uint number, PricingCategory pricingCategory, SeatAvailability seatAvailability)
         {
             RowName = rowName;
             Number = number;
             PricingCategory = pricingCategory;
-            SeatAvailability = seatAvailability;
+            this.seatAvailability = seatAvailability;
         }
 
-        public string RowName { get; }
         public uint Number { get; }
         public PricingCategory PricingCategory { get; }
-        private SeatAvailability SeatAvailability { get; set; }
+        public string RowName { get; }
 
         public bool IsAvailable()
-        {
-            return SeatAvailability == SeatAvailability.Available;
-        }
+            => seatAvailability == SeatAvailability.Available;
 
         public override string ToString()
-        {
-            return $"{RowName}{Number}";
-        }
+            => $"{RowName}{Number}";
 
         public bool MatchCategory(PricingCategory pricingCategory)
         {
             if (pricingCategory == PricingCategory.Mixed)
-            {
                 return true;
-            }
 
             return PricingCategory == pricingCategory;
         }
 
-        public void Allocate()
+        public Seat Allocate()
+            => seatAvailability == SeatAvailability.Available
+                   ? new Seat(
+                       RowName,
+                       Number,
+                       PricingCategory,
+                       SeatAvailability.Allocated)
+                   : this;
+
+        protected override IEnumerable<object> GetAllAttributesToBeUsedForEquality()
         {
-            if (SeatAvailability == SeatAvailability.Available)
-            {
-                SeatAvailability = SeatAvailability.Allocated;
-            }
+            yield return Number;
+            yield return RowName;
+            yield return PricingCategory;
+            yield return seatAvailability;
         }
     }
 }
